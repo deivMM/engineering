@@ -133,8 +133,15 @@ vline4 = ax4.axvline(angulo_init, color='red')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 
+color_list = []
+
+for _, row in df_angle.iterrows():
+    order = int(row["order"])
+    color_list.append(colors[order % len(colors)])
+
+
 def change_tab(label):
-    global current_df, arrows1, arrows2
+    global current_df, q1, q2
 
     angle_key = int(label)
     current_df = TU_tab_files_dict[angle_key]
@@ -149,6 +156,11 @@ def change_tab(label):
     ax2.cla()
     ax3.cla()
     ax4.cla()
+    
+    
+    q1 = None
+    q2 = None
+
 
     # volver a dibujar todo
     for order, group in current_df.groupby("order"):
@@ -167,11 +179,12 @@ radio.on_clicked(change_tab)
 def draw_arrows(df_angle, L=10):
     global q1, q2
     
-    # borrar anterior si existe
-    if 'q1' in globals() and q1:
+    if q1 is not None:
         q1.remove()
-    if 'q2' in globals() and q2:
+
+    if q2 is not None:
         q2.remove()
+
     
     X1 = df_angle["CPoint_x"].values
     Y1 = df_angle["CPoint_y"].values
@@ -198,8 +211,8 @@ def draw_arrows(df_angle, L=10):
         U2.append(-dir_yz[0] * L)
         V2.append(-dir_yz[1] * L)
     
-    q1 = ax1.quiver(X1, Y1, U1, V1)
-    q2 = ax2.quiver(X2, Y2, U2, V2)
+    q1 = ax1.quiver(X1, Y1, U1, V1, color=color_list)
+    q2 = ax2.quiver(X2, Y2, U2, V2, color=color_list)
 
 
 q1, q2 = None, None
