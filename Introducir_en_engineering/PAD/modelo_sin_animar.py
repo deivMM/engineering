@@ -8,7 +8,7 @@ from shapely.affinity import translate
 
 
 
-%matplotlib  qt
+# %matplotlib  qt
 # %matplotlib  inline
 
 

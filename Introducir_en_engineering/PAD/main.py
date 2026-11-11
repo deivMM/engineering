@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 from shapely.affinity import scale
 
 from shapely.geometry import Polygon
-from shapely.affinity import translate
+from shapely.affinity import translate, rotate
 from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt
 
-%matplotlib  qt
+# %matplotlib  qt
 # %matplotlib  inline
 
 
@@ -124,6 +124,7 @@ eje = (
     ])
 ).buffer(-radio_fillet)
 
+
 ### **************************************
 ### Modelo_roller
 
@@ -174,7 +175,7 @@ poly1 = ax1.fill(x_roller, y_roller, color='blue')[0]
 poly2 = ax1.fill(x_inner_izq, y_inner_izq, color='green')[0]
 poly3 = ax1.fill(x_inner_der, y_inner_der, color='green')[0]
 
-polys = [poly1, poly2, poly3]
+polys_roller = [poly1, poly2, poly3]
 
 # Geometrías shapely (datos base)
 geoms = [
@@ -185,8 +186,23 @@ geoms = [
 
 # Otras shapes estáticas
 ax1.fill(x_tulipa, y_tulipa, color='grey')
-ax1.fill(x_eje, y_eje, color='lightgrey')
-ax1.fill(x_tripod, y_tripod, color='darkgrey')
+poly_eje = ax1.fill(x_eje, y_eje, color='lightgrey')[0]
+poly_tripod = ax1.fill(x_tripod, y_tripod, color='darkgrey')[0]
+
+# Parches de matplotlib que sí se pueden mover en el update()
+polys_eje_tripod = [poly_eje, poly_tripod]
+
+# Geometrías shapely originales (base) de eje y tripod, para recalcular la traslación
+geoms_eje_tripod = [eje, tripod]
+
+# Punto de pivote para la rotación: centro del trípode
+centro_rotacion = tripod.centroid
+# origen_rotacion = (centro_rotacion.x, centro_rotacion.y)
+origen_rotacion = (0, -PCD/3)
+print(origen_rotacion)
+
+ax1.scatter(origen_rotacion[0], origen_rotacion[1], color='red')
+ax1.plot([-plunge*0.5, -plunge*0.5], [-altura_hombro-espesor_tulipa*0.5, altura_hombro+espesor_tulipa*0.5], color='black', linestyle='--')
 
 ax1.set_aspect('equal', adjustable='box')
 ax2.axis('off')
@@ -201,18 +217,25 @@ slider_rot = Slider(slider_ax2, 'Rotate', -30, 30, valinit=0)
 # Update
 def update(val):
     dx = slider_tr.val
+    angle = slider_rot.val
 
-    for poly, geom in zip(polys, geoms):
+    for poly, geom in zip(polys_roller, geoms):
         moved = translate(geom, xoff=dx)
+        x, y = moved.exterior.xy
+        poly.set_xy(list(zip(x, y)))
+
+    for poly, geom in zip(polys_eje_tripod, geoms_eje_tripod):
+        rotated = rotate(geom, angle, origin=origen_rotacion)
+        moved = translate(rotated, xoff=dx)
         x, y = moved.exterior.xy
         poly.set_xy(list(zip(x, y)))
 
     fig.canvas.draw_idle()
 
 slider_tr.on_changed(update)
+slider_rot.on_changed(update)
 
 ax1.set_xlim(-80, 50)
 ax1.set_ylim(-80, 80)
 
 plt.show()
-
