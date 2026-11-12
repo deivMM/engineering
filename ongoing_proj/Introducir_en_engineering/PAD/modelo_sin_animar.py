@@ -4,12 +4,11 @@ import matplotlib.pyplot as plt
 
 from shapely.affinity import scale
 
-from shapely.geometry import Polygon
 from shapely.affinity import translate
-from matplotlib.widgets import Slider
-import matplotlib.pyplot as plt
 
-%matplotlib  qt
+
+
+# %matplotlib  qt
 # %matplotlib  inline
 
 
@@ -167,52 +166,20 @@ x_inner_der, y_inner_der = inner_der.exterior.xy
 
 ##############################################################################
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+f, ax = plt.subplots(figsize=(12,12))
 
-#  Guardar polígonos matplotlib
-poly1 = ax1.fill(x_roller, y_roller, color='blue')[0]
-poly2 = ax1.fill(x_inner_izq, y_inner_izq, color='green')[0]
-poly3 = ax1.fill(x_inner_der, y_inner_der, color='green')[0]
+ax.fill(x_roller, y_roller, color='blue')
+ax.fill(x_inner_izq, y_inner_izq, color='green')
+ax.fill(x_inner_der, y_inner_der, color='green')
 
-polys = [poly1, poly2, poly3]
+ax.fill(x_tulipa, y_tulipa, color='grey')
+ax.fill(x_eje, y_eje, color='lightgrey')
+ax.fill(x_tripod, y_tripod, color='darkgrey')
 
-# Geometrías shapely (datos base)
-geoms = [
-    Polygon(zip(x_roller, y_roller)),
-    Polygon(zip(x_inner_izq, y_inner_izq)),
-    Polygon(zip(x_inner_der, y_inner_der))
-]
+ax.set_aspect('equal', adjustable='box')
 
-# Otras shapes estáticas
-ax1.fill(x_tulipa, y_tulipa, color='grey')
-ax1.fill(x_eje, y_eje, color='lightgrey')
-ax1.fill(x_tripod, y_tripod, color='darkgrey')
-
-ax1.set_aspect('equal', adjustable='box')
-ax2.axis('off')
-
-# Sliders
-slider_ax = fig.add_axes([0.55, 0.1, 0.3, 0.05])
-slider_tr = Slider(slider_ax, 'Translate', -30, 30, valinit=0)
-
-slider_ax2 = fig.add_axes([0.55, 0.2, 0.3, 0.05])
-slider_rot = Slider(slider_ax2, 'Rotate', -30, 30, valinit=0)
-
-# Update
-def update(val):
-    dx = slider_tr.val
-
-    for poly, geom in zip(polys, geoms):
-        moved = translate(geom, xoff=dx)
-        x, y = moved.exterior.xy
-        poly.set_xy(list(zip(x, y)))
-
-    fig.canvas.draw_idle()
-
-slider_tr.on_changed(update)
-
-ax1.set_xlim(-80, 50)
-ax1.set_ylim(-80, 80)
+ax.set_xlim(-80, 50)
+ax.set_ylim(-80, 80)
 
 plt.show()
 

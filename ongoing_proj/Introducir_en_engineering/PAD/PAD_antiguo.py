@@ -8,7 +8,7 @@ from matplotlib.patches import Polygon
 ##### script para desarrollar todo el PAD de la tulipa
 ##### -------------------------------------------------
 
-%matplotlib qt
+# %matplotlib qt
 
 
 L = 25
