@@ -73,6 +73,8 @@ CF_min = round(-1.05*df[["Force_xy", "Force_yz"]].min().min(), -2)
 fig, axs = plt.subplots(2, 2, figsize=(16, 10), facecolor='.85')
 plt.subplots_adjust(bottom=0.2)
 
+
+
 ax1, ax2 = axs[0]
 ax3, ax4 = axs[1]
 
